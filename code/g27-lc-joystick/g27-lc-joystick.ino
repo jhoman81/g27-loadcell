@@ -51,15 +51,15 @@ void setup() {
 void loop() {
     // Debugging - shows outputs of each value when uncommented
     // You can comment out the max and mins for each variable below to get own values to avoid waking bug.
-    // Serial.println (brake);
-    // Serial.println (throttleValue);
-    // Serial.println (clutchValue);
+    Serial.println (brake);
+    Serial.println (throttleValue);
+    Serial.println (clutchValue);
   
     // Set values below based on maximum and minimum values that you found above.
     
     // THROTTLE
     throttleValue = analogRead(throttle);
-
+    /*
     if (throttleValue > 666) {
         throttleValue = 670;
     }
@@ -70,6 +70,7 @@ void loop() {
         Joystick.setThrottle(throttleValue);
         lastThrottleValue = throttleValue;
     }
+    */
     delay(1);
 
     // BRAKE
@@ -78,6 +79,8 @@ void loop() {
     // If the value starts below 0 set it to 0. Or if its above 50 set it to 0
     // This fixes the slight drift and sets it to 0 if it starts below 0
     // Sets brake then gets reading
+    /*
+
     if (brake < 0 or brake < 8) {
         brake = 0;
     }
@@ -85,17 +88,18 @@ void loop() {
         Joystick.setBrake(brake);
         lastBrakeValue = brake;
     }
+    */
     delay(1);
 
     // CLUTCH
     clutchValue = analogRead(clutch);
-    
+    /*
     if (clutchValue < 185) {
         clutchValue = 180;
     }
     if (lastClutchValue != clutchValue) {
         Joystick.setZAxis(clutchValue);
         lastClutchValue = clutchValue;
-    }
+    } */
     delay(1);
 }
