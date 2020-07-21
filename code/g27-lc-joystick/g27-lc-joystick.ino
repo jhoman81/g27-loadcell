@@ -1,8 +1,8 @@
 #include <HX711.h>
 #include <Joystick.h>
 #define calibration_factor 2300 // Do your calibration first. default 2300
-#define DOUT  3
-#define CLK  2
+#define DOUT  4
+#define CLK  5
 
 HX711 scale;
 
