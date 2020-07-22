@@ -8,8 +8,8 @@
 // loaded into a generic joystick device that should work in any sim.
 
 // DEFINES
-#define calibration_factor 4000 // Calibrate loadcell to get this value
-#define DOUT  4                 // DOUT pin on HX711
+#define calibration_factor 3000 // Calibrate loadcell to get this value
+#define DOUT  6                 // DOUT pin on HX711
 #define CLK  5                  // CLK pin on HX711
 
 HX711 loadcell;
@@ -28,9 +28,9 @@ int clutch = A2;                // Clutch from G27 (Pin 4)
 int brake = 0;
 int lastBrakeValue = 0;
 int throttleValue = 0;
-int lastThrottleValue = 270; 
+int lastThrottleValue = 50; 
 int clutchValue = 0;
-int lastClutchValue = 180;
+int lastClutchValue = 50;
 
 void setup() {
     // Ranges are 1023 by default
@@ -59,18 +59,17 @@ void loop() {
     
     // THROTTLE
     throttleValue = analogRead(throttle);
-    /*
-    if (throttleValue > 666) {
-        throttleValue = 670;
+    
+    if (throttleValue > 890) {
+        throttleValue = 890 ;
     }
-    else if (throttleValue < 271) {
-        throttleValue = 270;
+    else if (throttleValue < 53) {
+        throttleValue = 50;
     }
     if (lastThrottleValue != throttleValue) {
         Joystick.setThrottle(throttleValue);
         lastThrottleValue = throttleValue;
     }
-    */
     delay(1);
 
     // BRAKE
@@ -79,7 +78,6 @@ void loop() {
     // If the value starts below 0 set it to 0. Or if its above 50 set it to 0
     // This fixes the slight drift and sets it to 0 if it starts below 0
     // Sets brake then gets reading
-    /*
 
     if (brake < 0 or brake < 8) {
         brake = 0;
@@ -88,18 +86,16 @@ void loop() {
         Joystick.setBrake(brake);
         lastBrakeValue = brake;
     }
-    */
     delay(1);
 
     // CLUTCH
     clutchValue = analogRead(clutch);
-    /*
-    if (clutchValue < 185) {
-        clutchValue = 180;
+    if (clutchValue < 53) {
+        clutchValue = 50;
     }
     if (lastClutchValue != clutchValue) {
         Joystick.setZAxis(clutchValue);
         lastClutchValue = clutchValue;
-    } */
+    } 
     delay(1);
 }
