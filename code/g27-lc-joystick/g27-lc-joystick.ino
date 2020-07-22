@@ -8,9 +8,17 @@
 // loaded into a generic joystick device that should work in any sim.
 
 // DEFINES
-#define calibration_factor 3000 // Calibrate loadcell to get this value
+// #define calibration_factor 3000 // Calibrate loadcell to get this value
 #define DOUT  6                 // DOUT pin on HX711
 #define CLK  5                  // CLK pin on HX711
+
+// How many samples to take at initialization of the library to zero
+// out the offset of the load cell.
+const int BRAKE_PEDAL_LOAD_CELL_TARE_REPS = 10;
+
+// Arbitary scaling. Single Load Cell.
+// Testing with set at 1100, pressing hard -  max brake_value is a value around 1200 to 1500 
+const int BRAKE_PEDAL_LOAD_CELL_SCALING = 1100;
 
 HX711 loadcell;
 
@@ -26,11 +34,12 @@ int clutch = A2;                // Clutch from G27 (Pin 4)
 
 // Value variables -- MUST INPUT OWN VALUES
 int brake = 0;
+int brakeValue = 0;
 int lastBrakeValue = 0;
 int throttleValue = 0;
-int lastThrottleValue = 50; 
+int lastThrottleValue = 0; 
 int clutchValue = 0;
-int lastClutchValue = 50;
+int lastClutchValue = 0;
 
 void setup() {
     // Ranges are 1023 by default
@@ -44,16 +53,16 @@ void setup() {
   
     // Calibrate prior to running, do not step on pedals
     loadcell.begin(DOUT, CLK);
-    loadcell.set_scale(calibration_factor); 
-    loadcell.tare();
+    // loadcell.set_scale(calibration_factor); 
+    loadcell.tare(BRAKE_PEDAL_LOAD_CELL_TARE_REPS);
 }
 
 void loop() {
     // Debugging - shows outputs of each value when uncommented
     // You can comment out the max and mins for each variable below to get own values to avoid waking bug.
-    Serial.println (brake);
-    Serial.println (throttleValue);
-    Serial.println (clutchValue);
+    // Serial.println (brake);
+    // Serial.println (throttleValue);
+    // Serial.println (clutchValue);
   
     // Set values below based on maximum and minimum values that you found above.
     
@@ -63,8 +72,8 @@ void loop() {
     if (throttleValue > 890) {
         throttleValue = 890 ;
     }
-    else if (throttleValue < 53) {
-        throttleValue = 50;
+    else if (throttleValue < 3) {
+        throttleValue = 0;
     }
     if (lastThrottleValue != throttleValue) {
         Joystick.setThrottle(throttleValue);
@@ -73,25 +82,35 @@ void loop() {
     delay(1);
 
     // BRAKE
-    brake = loadcell.get_units(); // if the value is inverted put a - sign in front like -scale.get
+    // brake = loadcell.get_units(1); // if the value is inverted put a - sign in front like -scale.get
+
+    brakeValue = loadcell.get_value(1);
+    brakeValue /= BRAKE_PEDAL_LOAD_CELL_SCALING;
+    brakeValue *= -1; // invert so off pedal is a higher value (0) than full pedal 
   
     // If the value starts below 0 set it to 0. Or if its above 50 set it to 0
     // This fixes the slight drift and sets it to 0 if it starts below 0
     // Sets brake then gets reading
 
-    if (brake < 0 or brake < 8) {
-        brake = 0;
+    // if (brake < 0 or brake < 8) {
+    //    brake = 0;
+    // }
+    
+    if (brakeValue > 0){
+        brakeValue = 0;  
     }
-    if (lastBrakeValue != brake) {
-        Joystick.setBrake(brake);
-        lastBrakeValue = brake;
-    }
+    Joystick.setBrake(brakeValue);
+
+//    if (lastBrakeValue != brake) {
+//       Joystick.setBrake(brake);
+//        lastBrakeValue = brake;
+//    }
     delay(1);
 
     // CLUTCH
     clutchValue = analogRead(clutch);
-    if (clutchValue < 53) {
-        clutchValue = 50;
+    if (clutchValue < 3) {
+        clutchValue = 0;
     }
     if (lastClutchValue != clutchValue) {
         Joystick.setZAxis(clutchValue);
