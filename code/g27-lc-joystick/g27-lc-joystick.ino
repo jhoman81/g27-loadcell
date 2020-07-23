@@ -14,7 +14,7 @@
 
 // How many samples to take at initialization of the library to zero
 // out the offset of the load cell.
-const int BRAKE_PEDAL_LOAD_CELL_TARE_REPS = 10;
+const int BRAKE_LOADCELL_TARE_REPS = 10;
 
 HX711 loadcell;
 
@@ -28,7 +28,7 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
 int throttle = A0;              // Throttle from G27 (Pin 2)
 int clutch = A2;                // Clutch from G27 (Pin 4)
 
-// Value variables -- MUST INPUT OWN VALUES
+// Value variables
 int brake = 0;
 int brakeValue = 0;
 int lastBrakeValue = 0;
@@ -39,8 +39,9 @@ int lastClutchValue = 0;
 
 void setup() {
     // Ranges are 1023 by default
-    Joystick.setBrakeRange(0, 800); 
-    Joystick.setThrottleRange(0, 1023); 
+    Joystick.setBrakeRange(0, 900); 
+    Joystick.setThrottleRange(50, 890);
+    Joystick.setZAxisRange(50, 890);
   
     Joystick.begin();
 
@@ -50,7 +51,7 @@ void setup() {
     // Calibrate prior to running, do not step on pedals
     loadcell.begin(DOUT, CLK);
     loadcell.set_scale(calibration_factor); 
-    loadcell.tare(BRAKE_PEDAL_LOAD_CELL_TARE_REPS);
+    loadcell.tare(BRAKE_LOADCELL_TARE_REPS);
 }
 
 void loop() {
@@ -65,12 +66,13 @@ void loop() {
     // THROTTLE
     throttleValue = analogRead(throttle);
     
-    if (throttleValue > 890) {
-        throttleValue = 890;
-    }
-    else if (throttleValue < 53) {
-        throttleValue = 0;
-    }
+    //if (throttleValue > 890) {
+    //    throttleValue = 890;
+    // }
+    // else if (throttleValue < 3) {
+    //    throttleValue = 0;
+    // }
+
     if (lastThrottleValue != throttleValue) {
         Joystick.setThrottle(throttleValue);
         lastThrottleValue = throttleValue;
@@ -84,20 +86,20 @@ void loop() {
     // This fixes the slight drift and sets it to 0 if it starts below 0
     // Sets brake then gets reading
     
-    if (brakeValue < 0 or brakeValue < 8){
-        brakeValue = 0;  
-    }
+    // if (brakeValue < 0 or brakeValue < 8){
+    //     brakeValue = 0;  
+    // }
     if (lastBrakeValue != brakeValue) {
-       Joystick.setBrake(brakeValue);
-       lastBrakeValue = brakeValue;
+        Joystick.setBrake(brakeValue);
+        lastBrakeValue = brakeValue;
     }
     delay(1);
 
     // CLUTCH
     clutchValue = analogRead(clutch);
-    if (clutchValue <= 53) {
-        clutchValue = 0;
-    }
+    // if (clutchValue <= 3) {
+    //    clutchValue = 0;
+    // }
     if (lastClutchValue != clutchValue) {
         Joystick.setZAxis(clutchValue);
         lastClutchValue = clutchValue;
