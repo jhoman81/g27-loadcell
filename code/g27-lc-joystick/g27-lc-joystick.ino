@@ -39,9 +39,9 @@ int lastClutchValue = 0;
 
 void setup() {
     // Ranges are 1023 by default
-    Joystick.setBrakeRange(0, 900); 
-    Joystick.setThrottleRange(50, 890);
-    Joystick.setZAxisRange(50, 890);
+    Joystick.setBrakeRange(0, 1023); 
+    Joystick.setThrottleRange(50, 900);
+    Joystick.setZAxisRange(50, 900);
   
     Joystick.begin();
 
@@ -69,10 +69,9 @@ void loop() {
     //if (throttleValue > 890) {
     //    throttleValue = 890;
     // }
-    // else if (throttleValue < 3) {
-    //    throttleValue = 0;
-    // }
-
+    if (throttleValue < 3) {
+       throttleValue = 0;
+    }
     if (lastThrottleValue != throttleValue) {
         Joystick.setThrottle(throttleValue);
         lastThrottleValue = throttleValue;
@@ -86,9 +85,9 @@ void loop() {
     // This fixes the slight drift and sets it to 0 if it starts below 0
     // Sets brake then gets reading
     
-    // if (brakeValue < 0 or brakeValue < 8){
-    //     brakeValue = 0;  
-    // }
+    if (brakeValue < 0 or brakeValue < 8){
+         brakeValue = 0;  
+    }
     if (lastBrakeValue != brakeValue) {
         Joystick.setBrake(brakeValue);
         lastBrakeValue = brakeValue;
@@ -97,9 +96,9 @@ void loop() {
 
     // CLUTCH
     clutchValue = analogRead(clutch);
-    // if (clutchValue <= 3) {
-    //    clutchValue = 0;
-    // }
+    if (clutchValue < 3) {
+        clutchValue = 0;
+    }
     if (lastClutchValue != clutchValue) {
         Joystick.setZAxis(clutchValue);
         lastClutchValue = clutchValue;
